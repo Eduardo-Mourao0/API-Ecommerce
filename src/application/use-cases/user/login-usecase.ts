@@ -1,6 +1,7 @@
-import { UserRepository } from '../../domain/repositories/userRepository'
-import { PasswordHasher } from '../../domain/services/password-hasher'
-import { TokenGenerator } from '../../domain/services/token-generator'
+import { UserRepository } from '../../../domain/repositories/userRepository'
+import { PasswordHasher } from '../../../domain/services/password-hasher'
+import { TokenGenerator } from '../../../domain/services/token-generator'
+import { BusinessError } from '../../../domain/errors/business-error'
 
 interface LoginUserRequest {
     email: string
@@ -23,13 +24,13 @@ export class LoginUserUseCase {
         const user = await this.userRepository.findByEmail(request.email)
 
         if (!user) {
-            throw new Error('Email ou senha inválidos.')
+            throw new BusinessError('Email ou senha inválidos.', 401)
         }
 
         const passwordMatch = await this.passwordHasher.compare(request.password, user.password)
 
         if (!passwordMatch) {
-            throw new Error('Email ou senha inválidos.')
+            throw new BusinessError('Email ou senha inválidos.', 401)
         }
 
         const token = this.tokenGenerator.generate({

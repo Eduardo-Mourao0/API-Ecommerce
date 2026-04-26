@@ -1,4 +1,5 @@
-import { UserRepository } from '../../domain/repositories/userRepository'
+import { UserRepository } from '../../../domain/repositories/userRepository'
+import { BusinessError } from '../../../domain/errors/business-error'
 
 interface DeleteUserRequest {
     id: string
@@ -12,7 +13,7 @@ export class DeleteUserUseCase {
         const user = await this.userRepository.findById(request.id)
 
         if (!user) {
-            throw new Error('User not found.')
+            throw new BusinessError('User not found.', 404)
         }
 
         await this.userRepository.delete(request.id)

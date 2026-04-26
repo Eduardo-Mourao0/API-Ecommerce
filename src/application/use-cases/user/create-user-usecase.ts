@@ -1,6 +1,7 @@
-import { UserRepository } from '../../domain/repositories/userRepository'
-import { User, UserRole } from '../../domain/entities/user'
-import { PasswordHasher } from '../../domain/services/password-hasher';
+import { UserRepository } from '../../../domain/repositories/userRepository'
+import { User, UserRole } from '../../../domain/entities/user'
+import { PasswordHasher } from '../../../domain/services/password-hasher';
+import { BusinessError } from '../../../domain/errors/business-error';
 
 interface CreateUserRequest {
     name: string
@@ -20,7 +21,7 @@ export class CreateUserUseCase {
         const existingUser = await this.userRepository.findByEmail(request.email);
 
         if(existingUser) {
-            throw new Error('Email already in use');
+            throw new BusinessError('Email already in use', 409);
         }
 
         const hashedPassword = await this.passwordHasher.hash(request.password)
