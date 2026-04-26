@@ -10,5 +10,5 @@ export interface UserRepository {
 
     findAll(): Promise<User[]>
 
-    delete(email: string): Promise<void>
+    delete(id: string): Promise<void>
 }
