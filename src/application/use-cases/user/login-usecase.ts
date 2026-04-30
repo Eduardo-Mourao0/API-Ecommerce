@@ -1,4 +1,4 @@
-import { UserRepository } from '../../../domain/repositories/userRepository'
+import { UserRepository } from '../../../domain/repositories/user-repository'
 import { PasswordHasher } from '../../../domain/services/password-hasher'
 import { TokenGenerator } from '../../../domain/services/token-generator'
 import { BusinessError } from '../../../domain/errors/business-error'

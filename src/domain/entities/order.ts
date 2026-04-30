@@ -8,7 +8,7 @@ export class Order {
     public readonly id: string
     public readonly userId: string
     public status: OrderStatus
-    public readonly valuerTotal: number
+    public readonly total: number
     public readonly createdAt: Date
     public readonly items: OrderItem[]
 
@@ -16,28 +16,28 @@ export class Order {
         id?: string
         userId: string
         status?: OrderStatus
-        valuerTotal: number
+        total: number
         createdAt?: Date
         items: OrderItem[]
     }) {
         this.id = props.id ?? uuidv4()
         this.userId = props.userId
         this.status = props.status ?? 'PENDING'
-        this.valuerTotal = props.valuerTotal
+        this.total = props.total
         this.createdAt = props.createdAt ?? new Date()
         this.items = props.items
     }
 
     static create(props: {
         userId: string
-        valuerTotal: number
+        total: number
         items: OrderItem[]
     }): Order {
         if (props.items.length === 0) {
             throw new BusinessError('O pedido deve ter pelo menos um item.')
         }
 
-        if (props.valuerTotal <= 0) {
+        if (props.total <= 0) {
             throw new BusinessError('O total deve ser maior que zero.')
         }
 
@@ -48,7 +48,7 @@ export class Order {
         id: string
         userId: string
         status: OrderStatus
-        valuerTotal: number
+        total: number
         createdAt: Date
         items: OrderItem[]
     }): Order {

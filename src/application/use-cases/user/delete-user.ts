@@ -1,4 +1,4 @@
-import { UserRepository } from '../../../domain/repositories/userRepository'
+import { UserRepository } from '../../../domain/repositories/user-repository'
 import { BusinessError } from '../../../domain/errors/business-error'
 
 interface DeleteUserRequest {
