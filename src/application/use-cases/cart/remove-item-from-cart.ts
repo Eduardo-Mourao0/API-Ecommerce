@@ -1,30 +1,41 @@
-import { Cart } from '../../../domain/entities/cart'
-import { CartRepository } from '../../../domain/repositories/cart-repository'
+import { CartDTO, toCartDTO } from '../../dtos/cart-dto'
 import { BusinessError } from '../../../domain/errors/business-error'
+import { ITransactionManager, PrismaTransactionClient } from '../../../domain/managers/ITransactionManager'
+import { CartRepository } from '../../../domain/repositories/cart-repository'
 
 interface RemoveItemFromCartRequest {
     userId: string
     cartItemId: string
 }
 
+type CartRepositoryFactory = (tx: PrismaTransactionClient) => CartRepository
+
 export class RemoveItemFromCartUseCase {
-    constructor(private cartRepository: CartRepository) {}
+    constructor(
+        private transactionManager: ITransactionManager,
+        private cartRepositoryFactory: CartRepositoryFactory
+    ) {}
 
-    async execute(request: RemoveItemFromCartRequest): Promise<Cart> {
-        const cart = await this.cartRepository.findByUserId(request.userId)
+    async execute(request: RemoveItemFromCartRequest): Promise<CartDTO> {
+        return await this.transactionManager.execute(async (tx) => {
+            const cartRepository = this.cartRepositoryFactory(tx)
+            const cart = await cartRepository.findByUserId(request.userId)
 
-        if (!cart) {
-            throw new BusinessError('Você não possui um carrinho.')
-        }
+            if (!cart) {
+                throw new BusinessError('Voc\u00ea n\u00e3o possui um carrinho.')
+            }
 
-        const item = cart.items.find(i => i.id === request.cartItemId)
+            const item = cart.items.find(i => i.id === request.cartItemId)
 
-        if (!item) {
-            throw new BusinessError('Item não encontrado no carrinho.')
-        }
+            if (!item) {
+                throw new BusinessError('Item n\u00e3o encontrado no carrinho.')
+            }
 
-        cart.removeItem(request.cartItemId)
+            cart.removeItem(request.cartItemId)
 
-        return await this.cartRepository.update(cart)
+            const updatedCart = await cartRepository.update(cart)
+
+            return toCartDTO(updatedCart)
+        })
     }
 }

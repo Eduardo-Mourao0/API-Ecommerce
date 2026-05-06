@@ -1,43 +1,47 @@
+import { LoginUserDTO } from '../../dtos/user-dto'
+import { BusinessError } from '../../../domain/errors/business-error'
+import { ITransactionManager, PrismaTransactionClient } from '../../../domain/managers/ITransactionManager'
 import { UserRepository } from '../../../domain/repositories/user-repository'
 import { PasswordHasher } from '../../../domain/services/password-hasher'
 import { TokenGenerator } from '../../../domain/services/token-generator'
-import { BusinessError } from '../../../domain/errors/business-error'
 
 interface LoginUserRequest {
     email: string
     password: string
 }
 
-interface LoginUserResponse {
-    token: string
-}
+type UserRepositoryFactory = (tx: PrismaTransactionClient) => UserRepository
 
 export class LoginUserUseCase {
     constructor(
-        private userRepository: UserRepository,
+        private transactionManager: ITransactionManager,
+        private userRepositoryFactory: UserRepositoryFactory,
         private passwordHasher: PasswordHasher,
         private tokenGenerator: TokenGenerator
     ) {}
 
-    async execute(request: LoginUserRequest): Promise<LoginUserResponse> {
-        
-        const user = await this.userRepository.findByEmail(request.email)
+    async execute(request: LoginUserRequest): Promise<LoginUserDTO> {
+        return await this.transactionManager.execute(async (tx) => {
+            const userRepository = this.userRepositoryFactory(tx)
 
-        if (!user) {
-            throw new BusinessError('Email ou senha inválidos.', 401)
-        }
+            const user = await userRepository.findByEmail(request.email)
 
-        const passwordMatch = await this.passwordHasher.compare(request.password, user.password)
+            if (!user) {
+                throw new BusinessError('Email ou senha inv\u00e1lidos.', 401)
+            }
 
-        if (!passwordMatch) {
-            throw new BusinessError('Email ou senha inválidos.', 401)
-        }
+            const passwordMatch = await this.passwordHasher.compare(request.password, user.password)
 
-        const token = this.tokenGenerator.generate({
-            id: user.id,
-            role: user.role,
+            if (!passwordMatch) {
+                throw new BusinessError('Email ou senha inv\u00e1lidos.', 401)
+            }
+
+            const token = this.tokenGenerator.generate({
+                id: user.id,
+                role: user.role,
+            })
+
+            return { token }
         })
-
-        return { token }
     }
 }

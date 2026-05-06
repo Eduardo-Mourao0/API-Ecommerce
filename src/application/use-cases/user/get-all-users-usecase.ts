@@ -1,10 +1,21 @@
-import { User } from "../../../domain/entities/user";
-import { UserRepository } from "../../../domain/repositories/user-repository";
+import { toUserDTO, UserDTO } from '../../dtos/user-dto'
+import { ITransactionManager, PrismaTransactionClient } from '../../../domain/managers/ITransactionManager'
+import { UserRepository } from '../../../domain/repositories/user-repository'
+
+type UserRepositoryFactory = (tx: PrismaTransactionClient) => UserRepository
 
 export class GetAllUsersUseCase {
-    constructor(private userRepository: UserRepository) {}
+    constructor(
+        private transactionManager: ITransactionManager,
+        private userRepositoryFactory: UserRepositoryFactory
+    ) {}
 
-    async execute(): Promise<User[]> {
-        return await this.userRepository.findAll();
+    async execute(): Promise<UserDTO[]> {
+        return await this.transactionManager.execute(async (tx) => {
+            const userRepository = this.userRepositoryFactory(tx)
+            const users = await userRepository.findAll()
+
+            return users.map(toUserDTO)
+        })
     }
 }

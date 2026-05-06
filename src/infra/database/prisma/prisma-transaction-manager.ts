@@ -17,12 +17,12 @@ export class PrismaTransactionManager implements ITransactionManager {
         action: TransactionCallback<T>,
         timeout?: number
     ): Promise<T> {
-        return await (prisma as any).$transaction(
-        (tx: any) => action(tx as PrismaTransactionClient),
-        {
-            ...this.config,
-            timeout: timeout ?? this.config.timeout
-        }
+        return await this.transactionClient.$transaction(
+            (tx: any) => action(tx as PrismaTransactionClient),
+            {
+                ...this.config,
+                timeout: timeout ?? this.config.timeout
+            }
         );
     }
 }

@@ -1,21 +1,30 @@
-import { Product } from "../../../domain/entities/product"
+import { ProductDTO, toProductDTO } from '../../dtos/product-dto'
+import { BusinessError } from '../../../domain/errors/business-error'
+import { ITransactionManager, PrismaTransactionClient } from '../../../domain/managers/ITransactionManager'
 import { ProductRepository } from '../../../domain/repositories/product-repository'
-import { BusinessError } from "../../../domain/errors/business-error"
 
 interface GetProductByNameRequest {
     name: string
 }
 
+type ProductRepositoryFactory = (tx: PrismaTransactionClient) => ProductRepository
+
 export class GetProductByNameUseCase {
-    constructor(private productRepository: ProductRepository) {}
+    constructor(
+        private transactionManager: ITransactionManager,
+        private productRepositoryFactory: ProductRepositoryFactory
+    ) {}
 
-    async execute(request: GetProductByNameRequest): Promise<Product[]> {
-        const products = await this.productRepository.findByName(request.name)
+    async execute(request: GetProductByNameRequest): Promise<ProductDTO[]> {
+        return await this.transactionManager.execute(async (tx) => {
+            const productRepository = this.productRepositoryFactory(tx)
+            const products = await productRepository.findByName(request.name)
 
-        if (products.length === 0) {
-            throw new BusinessError('Nenhum produto encontrado.', 404)
-        }
+            if (products.length === 0) {
+                throw new BusinessError('Nenhum produto encontrado.', 404)
+            }
 
-        return products
+            return products.map(toProductDTO)
+        })
     }
 }

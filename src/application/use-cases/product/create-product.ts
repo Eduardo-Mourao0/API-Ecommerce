@@ -1,5 +1,7 @@
-import { Product } from "../../../domain/entities/product"
-import { ProductRepository } from "../../../domain/repositories/product-repository"
+import { ProductDTO, toProductDTO } from '../../dtos/product-dto'
+import { Product } from '../../../domain/entities/product'
+import { ITransactionManager, PrismaTransactionClient } from '../../../domain/managers/ITransactionManager'
+import { ProductRepository } from '../../../domain/repositories/product-repository'
 
 interface CreateProductRequest {
     name: string
@@ -8,11 +10,21 @@ interface CreateProductRequest {
     stock: number
 }
 
-export class CreateProductUseCase {
-    constructor(private productRepository: ProductRepository) {}
+type ProductRepositoryFactory = (tx: PrismaTransactionClient) => ProductRepository
 
-    async execute(request: CreateProductRequest): Promise<Product> {
-        const product = Product.create(request)
-        return await this.productRepository.create(product)
+export class CreateProductUseCase {
+    constructor(
+        private transactionManager: ITransactionManager,
+        private productRepositoryFactory: ProductRepositoryFactory
+    ) {}
+
+    async execute(request: CreateProductRequest): Promise<ProductDTO> {
+        return await this.transactionManager.execute(async (tx) => {
+            const productRepository = this.productRepositoryFactory(tx)
+            const product = Product.create(request)
+            const createdProduct = await productRepository.create(product)
+
+            return toProductDTO(createdProduct)
+        })
     }
 }

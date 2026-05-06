@@ -1,21 +1,29 @@
-import { UserRepository } from '../../../domain/repositories/user-repository'
 import { BusinessError } from '../../../domain/errors/business-error'
+import { ITransactionManager, PrismaTransactionClient } from '../../../domain/managers/ITransactionManager'
+import { UserRepository } from '../../../domain/repositories/user-repository'
 
 interface DeleteUserRequest {
     id: string
 }
 
+type UserRepositoryFactory = (tx: PrismaTransactionClient) => UserRepository
+
 export class DeleteUserUseCase {
-    constructor(private userRepository: UserRepository) {}
+    constructor(
+        private transactionManager: ITransactionManager,
+        private userRepositoryFactory: UserRepositoryFactory
+    ) {}
 
     async execute(request: DeleteUserRequest): Promise<void> {
-        
-        const user = await this.userRepository.findById(request.id)
+        await this.transactionManager.execute(async (tx) => {
+            const userRepository = this.userRepositoryFactory(tx)
+            const user = await userRepository.findById(request.id)
 
-        if (!user) {
-            throw new BusinessError('User not found.', 404)
-        }
+            if (!user) {
+                throw new BusinessError('User not found.', 404)
+            }
 
-        await this.userRepository.delete(request.id)
+            await userRepository.delete(request.id)
+        })
     }
 }

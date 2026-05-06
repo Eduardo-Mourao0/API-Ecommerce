@@ -1,23 +1,34 @@
-import { IOrderRepository } from "../../../domain/repositories/order-repository"
-import { BusinessError } from "../../../domain/errors/business-error"
-import { Order } from "../../../domain/entities/order"
+import { OrderDTO, toOrderDTO } from '../../dtos/order-dto'
+import { BusinessError } from '../../../domain/errors/business-error'
+import { ITransactionManager, PrismaTransactionClient } from '../../../domain/managers/ITransactionManager'
+import { IOrderRepository } from '../../../domain/repositories/order-repository'
 
 interface CancelOrderRequest {
     orderId: string
 }
 
+type OrderRepositoryFactory = (tx: PrismaTransactionClient) => IOrderRepository
+
 export class CancelOrderUseCase {
-    constructor(private orderRepository: IOrderRepository) {}
-    
-    async execute(request: CancelOrderRequest): Promise<Order> {
-        const order = await this.orderRepository.findById(request.orderId)
-    
-        if (!order) {
-            throw new BusinessError('Pedido não encontrado.')
-        }
-    
-        order.cancel()
-    
-        return await this.orderRepository.update(order)
+    constructor(
+        private transactionManager: ITransactionManager,
+        private orderRepositoryFactory: OrderRepositoryFactory
+    ) {}
+
+    async execute(request: CancelOrderRequest): Promise<OrderDTO> {
+        return await this.transactionManager.execute(async (tx) => {
+            const orderRepository = this.orderRepositoryFactory(tx)
+            const order = await orderRepository.findById(request.orderId)
+
+            if (!order) {
+                throw new BusinessError('Pedido n\u00e3o encontrado.')
+            }
+
+            order.cancel()
+
+            const updatedOrder = await orderRepository.update(order)
+
+            return toOrderDTO(updatedOrder)
+        })
     }
 }

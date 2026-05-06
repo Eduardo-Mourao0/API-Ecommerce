@@ -1,20 +1,29 @@
-import { ProductRepository } from '../../../domain/repositories/product-repository'
 import { BusinessError } from '../../../domain/errors/business-error'
+import { ITransactionManager, PrismaTransactionClient } from '../../../domain/managers/ITransactionManager'
+import { ProductRepository } from '../../../domain/repositories/product-repository'
 
 interface DeleteProductRequest {
     id: string
 }
 
+type ProductRepositoryFactory = (tx: PrismaTransactionClient) => ProductRepository
+
 export class DeleteProductUseCase {
-    constructor(private productRepository: ProductRepository) {}
+    constructor(
+        private transactionManager: ITransactionManager,
+        private productRepositoryFactory: ProductRepositoryFactory
+    ) {}
 
     async execute(request: DeleteProductRequest): Promise<void> {
-        const product = await this.productRepository.findById(request.id)
+        await this.transactionManager.execute(async (tx) => {
+            const productRepository = this.productRepositoryFactory(tx)
+            const product = await productRepository.findById(request.id)
 
-        if (!product) {
-        throw new BusinessError('Produto não encontrado.')
-        }
+            if (!product) {
+                throw new BusinessError('Produto n\u00e3o encontrado.')
+            }
 
-        await this.productRepository.delete(request.id)
+            await productRepository.delete(request.id)
+        })
     }
 }
