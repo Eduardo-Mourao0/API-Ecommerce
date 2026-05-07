@@ -1,65 +1,77 @@
-# 🛒 Api-Ecommerce
+# API Ecommerce
 
-API RESTful de e-commerce construída com Node.js, TypeScript, Express e PostgreSQL seguindo os princípios de Clean Architecture e DDD. Possui autenticação JWT, controle de acesso por roles e Prisma ORM.
+API REST de ecommerce desenvolvida com **Node.js**, **Express**, **TypeScript**, **Prisma** e **PostgreSQL**.
 
-## 🚀 Tecnologias
+O projeto segue principios de **Clean Architecture**, mantendo controllers finos, use cases responsaveis pelas regras de aplicacao e repositorios isolando o acesso ao banco de dados.
 
-- **Node.js** + **TypeScript**
-- **Express**
-- **PostgreSQL** + **Prisma ORM**
-- **JWT** — autenticação
-- **Bcryptjs** — hash de senhas
-- **Docker** + **Docker Compose**
-- **UUID** — geração de IDs no domínio
+## Tecnologias
 
-## 🏗️ Arquitetura
+- Node.js
+- TypeScript
+- Express
+- PostgreSQL
+- Prisma ORM
+- JWT
+- Bcryptjs
+- Docker Compose
 
-O projeto segue os princípios de **Clean Architecture** e **DDD (Domain-Driven Design)**, separando as responsabilidades em camadas:
+## Arquitetura
 
-```
+```text
 src/
-├── domain/              # Entidades, repositórios (interfaces) e erros
-│   ├── entities/
-│   ├── repositories/
-│   ├── services/
-│   └── errors/
-├── application/         # Casos de uso
-│   └── use-cases/
-├── infra/               # Implementações concretas
-│   ├── database/
-│   ├── http/
-│   ├── repositories/
-│   └── services/
-└── main/                # Bootstrap da aplicação
+|-- domain/        # Entidades, erros, contratos e regras de dominio
+|-- application/   # Use cases, DTOs e factories
+|-- infra/         # Banco, HTTP, repositorios e servicos externos
+`-- main/          # Bootstrap da aplicacao
 ```
 
-## 📦 Módulos
+## Modulos
 
-### 👤 Usuários
-- Registro com validação de nome, email e senha
+### Usuarios
+
+- Cadastro de usuario
 - Login com JWT
-- Listagem de usuários (admin)
-- Exclusão de conta
+- Listagem de usuarios
+- Exclusao de usuario
 
-### 📦 Produtos
-- CRUD completo (admin)
-- Listagem e pesquisa por nome
-- Controle de stock
+### Produtos
 
-### 🛒 Carrinho
-- Adicionar/remover itens
-- Visualizar carrinho
+- Criacao de produto
+- Listagem de produtos
+- Busca por nome
+- Atualizacao de produto
+- Exclusao de produto
+
+### Carrinho
+
+- Adicionar item ao carrinho
+- Remover item do carrinho
+- Consultar carrinho
 - Limpar carrinho
 
-### 📋 Pedidos
-- Criar pedido a partir do carrinho
-- Listar pedidos do utilizador
+### Pedidos
+
+- Criar pedido
+- Listar pedidos
 - Cancelar pedido
-- Simular pagamento
+- Pagar pedido
 
-## 👥 Roles
+## Scripts
 
-| Role    | Permissões |
-|---------|-----------|
-| `CLIENT` | Carrinho, pedidos, perfil |
-| `ADMIN`  | CRUD de produtos, listagem de usuários |
+```bash
+npm run dev
+npm run build
+npm start
+```
+
+## Autenticacao
+
+Rotas protegidas utilizam JWT no header:
+
+```http
+Authorization: Bearer token
+```
+
+## Status
+
+Projeto em desenvolvimento, com estrutura base de dominio, aplicacao, infraestrutura, use cases, controllers, DTOs e factories.

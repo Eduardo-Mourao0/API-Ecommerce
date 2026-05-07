@@ -31,7 +31,7 @@ export class CreateOrderUseCase {
             const cart = await cartRepository.findByUserId(request.userId)
 
             if (!cart || cart.items.length === 0) {
-                throw new BusinessError('Voc\u00ea n\u00e3o possui items no carrinho.')
+                throw new BusinessError('Você nao possui items no carrinho.')
             }
 
             let total = 0
@@ -41,7 +41,7 @@ export class CreateOrderUseCase {
                 const product = await productRepository.findById(cartItem.productId)
 
                 if (!product) {
-                    throw new BusinessError('Produto n\u00e3o encontrado.')
+                    throw new BusinessError('Produto nao encontrado.')
                 }
 
                 if (product.stock < cartItem.quantity) {

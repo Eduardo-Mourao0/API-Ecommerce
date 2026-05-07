@@ -21,7 +21,7 @@ export class CancelOrderUseCase {
             const order = await orderRepository.findById(request.orderId)
 
             if (!order) {
-                throw new BusinessError('Pedido n\u00e3o encontrado.')
+                throw new BusinessError('Pedido nao encontrado.')
             }
 
             order.cancel()

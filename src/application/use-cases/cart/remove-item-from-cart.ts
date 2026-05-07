@@ -22,13 +22,13 @@ export class RemoveItemFromCartUseCase {
             const cart = await cartRepository.findByUserId(request.userId)
 
             if (!cart) {
-                throw new BusinessError('Voc\u00ea n\u00e3o possui um carrinho.')
+                throw new BusinessError('Você não possui um carrinho.')
             }
 
             const item = cart.items.find(i => i.id === request.cartItemId)
 
             if (!item) {
-                throw new BusinessError('Item n\u00e3o encontrado no carrinho.')
+                throw new BusinessError('Item nao encontrado no carrinho.')
             }
 
             cart.removeItem(request.cartItemId)

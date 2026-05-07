@@ -20,7 +20,7 @@ export class DeleteProductUseCase {
             const product = await productRepository.findById(request.id)
 
             if (!product) {
-                throw new BusinessError('Produto n\u00e3o encontrado.')
+                throw new BusinessError('Produto nao encontrado.')
             }
 
             await productRepository.delete(request.id)

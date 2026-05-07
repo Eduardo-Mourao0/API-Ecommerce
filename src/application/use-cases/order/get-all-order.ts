@@ -21,7 +21,7 @@ export class GetUserOrdersUseCase {
             const orders = await orderRepository.findByUserId(request.userId)
 
             if (orders.length === 0) {
-                throw new BusinessError('Voc\u00ea n\u00e3o possui pedidos.')
+                throw new BusinessError('Você nao possui pedidos.')
             }
 
             return orders.map(toOrderDTO)

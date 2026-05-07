@@ -21,7 +21,7 @@ export class GetCartUseCase {
             const cart = await cartRepository.findByUserId(request.userId)
 
             if (!cart) {
-                throw new BusinessError('Voc\u00ea n\u00e3o possui um carrinho.')
+                throw new BusinessError('Você não possui um carrinho.')
             }
 
             return toCartDTO(cart)

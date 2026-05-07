@@ -26,6 +26,7 @@ export class AddItemToCartUseCase {
         return await this.transactionManager.execute(async (tx) => {
             const cartRepository = this.cartRepositoryFactory(tx)
             const productRepository = this.productRepositoryFactory(tx)
+            
             const product = await productRepository.findById(request.productId)
 
             if (!product) {
