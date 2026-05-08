@@ -1,5 +1,16 @@
 # 🛒 API Ecommerce
 
+<p>
+  <img src="https://img.shields.io/badge/TypeScript-3178C6?style=for-the-badge&logo=typescript&logoColor=white" />
+  <img src="https://img.shields.io/badge/Node.js-339933?style=for-the-badge&logo=node.js&logoColor=white" />
+  <img src="https://img.shields.io/badge/Express-000000?style=for-the-badge&logo=express&logoColor=white" />
+  <img src="https://img.shields.io/badge/Prisma-2D3748?style=for-the-badge&logo=prisma&logoColor=white" />
+  <img src="https://img.shields.io/badge/PostgreSQL-4169E1?style=for-the-badge&logo=postgresql&logoColor=white" />
+  <img src="https://img.shields.io/badge/Docker-2496ED?style=for-the-badge&logo=docker&logoColor=white" />
+  <img src="https://img.shields.io/badge/JWT-000000?style=for-the-badge&logo=jsonwebtokens&logoColor=white" />
+  <img src="https://img.shields.io/badge/Bcryptjs-6A4C93?style=for-the-badge&logo=security&logoColor=white" />
+</p>
+
 API RESTful de e-commerce desenvolvida com **Node.js**, **Express**, **TypeScript**, **PostgreSQL** e **Prisma ORM**.
 
 O projeto foi construído com foco em organização, separação de responsabilidades e boas práticas de arquitetura, aplicando conceitos de **Clean Architecture** e **DDD** para manter o domínio da aplicação independente das tecnologias externas.
@@ -11,19 +22,6 @@ O projeto foi construído com foco em organização, separação de responsabili
 Esta API simula o funcionamento básico de um sistema de e-commerce, permitindo o gerenciamento de usuários, produtos, carrinho de compras, pedidos e pagamentos.
 
 A aplicação possui autenticação com **JWT**, criptografia de senha com **Bcrypt**, controle de acesso por perfil de usuário e persistência de dados utilizando **PostgreSQL** com **Prisma ORM**.
-
----
-
-## 🧰 Tecnologias utilizadas
-
-- Node.js
-- TypeScript
-- Express
-- PostgreSQL
-- Prisma ORM
-- JWT
-- Bcryptjs
-- Docker Compose
 
 ---
 
