@@ -5,7 +5,7 @@ import { CartRepository } from '../../domain/repositories/cart-repository'
 import { PrismaTransactionClient } from '../../domain/managers/ITransactionManager'
 
 type CartWithItems = Prisma.CartGetPayload<{
-    include: { items: true }
+    include: { items: { include: { product: true } } }
 }>
 
 export class PrismaCartRepository implements CartRepository {
@@ -22,7 +22,7 @@ export class PrismaCartRepository implements CartRepository {
     async findByUserId(userId: string): Promise<Cart | null> {
         const data = await this.tx.cart.findUnique({
             where: { userId },
-            include: { items: true },
+            include: { items: { include: { product: true } } },
         })
 
         if (!data) return null
@@ -39,7 +39,7 @@ export class PrismaCartRepository implements CartRepository {
         await this.deleteRemovedItems(cart)
         await this.upsertItems(cart.items)
 
-        return cart
+        return (await this.findByUserId(cart.userId)) ?? cart
     }
 
     async clear(cartId: string): Promise<void> {
@@ -60,7 +60,14 @@ export class PrismaCartRepository implements CartRepository {
             id: cart.id,
             userId: cart.userId,
             updatedAt: cart.updatedAt,
-            items: cart.items.map(item => CartItem.createFromPrimitives(item)),
+            items: cart.items.map(item => CartItem.createFromPrimitives({
+                id: item.id,
+                cartId: item.cartId,
+                productId: item.productId,
+                quantity: item.quantity,
+                productName: item.product.name,
+                productPrice: Number(item.product.price),
+            })),
         })
     }
 

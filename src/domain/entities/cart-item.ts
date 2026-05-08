@@ -6,17 +6,23 @@ export class CartItem {
     public readonly cartId: string
     public readonly productId: string
     public quantity: number
+    public readonly productName?: string
+    public readonly productPrice?: number
 
     constructor(props: {
         id?: string
         cartId: string
         productId: string
         quantity: number
+        productName?: string
+        productPrice?: number
     }) {
         this.id = props.id ?? uuidv4()
         this.cartId = props.cartId
         this.productId = props.productId
         this.quantity = props.quantity
+        this.productName = props.productName
+        this.productPrice = props.productPrice
     }
 
     static create(props: {
@@ -37,6 +43,8 @@ export class CartItem {
         cartId: string
         productId: string
         quantity: number
+        productName?: string
+        productPrice?: number
     }): CartItem {
         return new CartItem(data)
     }
