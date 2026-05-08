@@ -33,6 +33,7 @@ export class Order {
         total: number
         items: OrderItem[]
     }): Order {
+        
         if (props.items.length === 0) {
             throw new BusinessError('O pedido deve ter pelo menos um item.')
         }
@@ -56,16 +57,26 @@ export class Order {
     }
 
     cancel(): void {
+        
+        if (this.status === 'CANCELLED') {
+            throw new BusinessError('Pedido ja foi cancelado.')
+        }
+
         if (this.status === 'PAID') {
-            throw new BusinessError('Não é possível cancelar um pedido já pago.')
+            throw new BusinessError('Pedido ja foi pago.')
         }
 
         this.status = 'CANCELLED'
     }
 
     pay(): void {
+        
+        if (this.status === 'PAID') {
+            throw new BusinessError('Pedido ja foi pago.')
+        }
+
         if (this.status === 'CANCELLED') {
-            throw new BusinessError('Não é possível pagar um pedido cancelado.')
+            throw new BusinessError('Pedido ja foi cancelado.')
         }
 
         this.status = 'PAID'
