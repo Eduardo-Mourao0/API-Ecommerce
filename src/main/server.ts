@@ -1,6 +1,10 @@
-import express, { type NextFunction, type Request, type Response } from 'express'
+import express from 'express'
 import dotenv from 'dotenv'
-import { BusinessError } from '../domain/errors/business-error'
+import { cartRoutes } from '../infra/http/routes/cart-routes'
+import { orderRoutes } from '../infra/http/routes/order-routes'
+import { productRoutes } from '../infra/http/routes/product-routes'
+import { userRoutes } from '../infra/http/routes/user-routes'
+import { errorMiddleware } from '../infra/http/middlewares/error-middleware'
 
 dotenv.config()
 
@@ -8,27 +12,17 @@ const app = express()
 
 app.use(express.json())
 
-// Registre as rotas acima deste middleware.
-app.use((error: Error, _request: Request, response: Response, _next: NextFunction) => {
-  if (error instanceof BusinessError) {
-    return response.status(error.statusCode).json({
-      error: error.name,
-      message: error.message,
-    })
-  }
+app.use(userRoutes)
+app.use(productRoutes)
+app.use(cartRoutes)
+app.use(orderRoutes)
 
-  console.error(error)
-
-  return response.status(500).json({
-    error: 'InternalServerError',
-    message: 'Erro interno do servidor.',
-  })
-})
+app.use(errorMiddleware)
 
 const PORT = process.env.PORT || 3000
 
 app.listen(PORT, () => {
-  console.log(`🚀 Server running on port ${PORT}`)
+  console.log(`Server running on port ${PORT}`)
 })
 
 export { app }

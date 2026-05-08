@@ -98,3 +98,12 @@ model Payment {
 
   order Order @relation(fields: [orderId], references: [id], onDelete: Cascade)
 }
+
+model Log {
+  id        String   @id
+  level     String
+  message   String
+  route     String?
+  stack     String?
+  createdAt DateTime @default(now())
+}

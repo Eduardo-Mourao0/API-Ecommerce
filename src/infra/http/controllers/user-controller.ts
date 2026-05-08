@@ -41,7 +41,9 @@ export class UserController {
 
             await this.userUseCases.deleteUser.execute({ id: userId })
 
-            res.status(204).send()
+            res.status(200).json({
+                message: 'Usuario deletado com sucesso.',
+            })
         } catch (error) {
             next(error)
         }
