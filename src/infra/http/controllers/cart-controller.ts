@@ -53,7 +53,9 @@ export class CartController {
 
             await this.cartUseCases.clearCart.execute({ userId })
 
-            res.status(204).send()
+            res.status(200).json({
+                message: 'Carrinho limpo com sucesso.',
+            })
         } catch (error) {
             next(error)
         }

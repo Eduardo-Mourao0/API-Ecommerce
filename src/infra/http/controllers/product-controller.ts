@@ -60,7 +60,9 @@ export class ProductController {
         try {
             await this.productUseCases.deleteProduct.execute({ id: getRouteParam(req, 'id') })
 
-            res.status(204).send()
+            res.status(200).json({
+                message: 'Produto deletado com sucesso.',
+            })
         } catch (error) {
             next(error)
         }
