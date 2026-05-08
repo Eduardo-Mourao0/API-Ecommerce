@@ -18,13 +18,14 @@ export class Logger{
         }
     }
 
-    static async warn(message: string) {
+    static async warn(message: string, route?: string) {
         try {
             await prisma.log.create({
                 data: {
                     id: uuidv4(),
                     level: "WARN",
                     message,
+                    route
                 }
             });
         } catch (error) {

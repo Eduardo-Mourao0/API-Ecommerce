@@ -8,9 +8,8 @@ export async function errorMiddleware(
     res: Response,
     next: NextFunction
 ): Promise<void> {
-    await Logger.error(error, req.path)
-
     if (error instanceof BusinessError) {
+        await Logger.warn(error.message, req.path)
         
         res.status(error.statusCode).json({
         error: error.name,
@@ -18,6 +17,8 @@ export async function errorMiddleware(
         })
         return
     }
+
+    await Logger.error(error, req.path)
 
     res.status(500).json({
         error: 'InternalServerError',
