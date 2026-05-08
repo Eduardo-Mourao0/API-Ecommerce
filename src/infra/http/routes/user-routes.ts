@@ -8,12 +8,7 @@ const userController = makeUserController()
 
 userRoutes.post('/users', userController.create.bind(userController))
 userRoutes.post('/login', userController.login.bind(userController))
-userRoutes.get(
-    '/users',
-    authMiddleware(),
-    roleMiddleware(['ADMIN']),
-    userController.getAll.bind(userController)
-)
+userRoutes.get('/users', authMiddleware(), roleMiddleware(['ADMIN']),userController.getAll.bind(userController))
 userRoutes.delete('/users/me', authMiddleware(), userController.delete.bind(userController))
 
 export { userRoutes }

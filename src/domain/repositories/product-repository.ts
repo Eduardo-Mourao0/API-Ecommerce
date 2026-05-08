@@ -6,6 +6,8 @@ export interface ProductRepository {
     
     findById(id: string): Promise<Product | null>
 
+    findExactMatch(product: Product): Promise<Product | null>
+
     findByName(name: string): Promise<Product[]>
     
     findAll(): Promise<Product[]>

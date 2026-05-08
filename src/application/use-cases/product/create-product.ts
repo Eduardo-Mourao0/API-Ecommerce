@@ -22,6 +22,16 @@ export class CreateProductUseCase {
         return await this.transactionManager.execute(async (tx) => {
             const productRepository = this.productRepositoryFactory(tx)
             const product = Product.create(request)
+            const existingProduct = await productRepository.findExactMatch(product)
+
+            if (existingProduct) {
+                existingProduct.stock += product.stock
+
+                const updatedProduct = await productRepository.update(existingProduct)
+
+                return toProductDTO(updatedProduct)
+            }
+
             const createdProduct = await productRepository.create(product)
 
             return toProductDTO(createdProduct)

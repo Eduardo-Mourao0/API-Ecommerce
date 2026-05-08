@@ -32,7 +32,12 @@ export class CreateUserUseCase {
             }
 
             const hashedPassword = await this.passwordHasher.hash(request.password)
-            const user = User.create({ ...request, password: hashedPassword })
+            const user = User.create({
+                name: request.name,
+                email: request.email,
+                password: hashedPassword,
+                role: 'CLIENT',
+            })
 
             await userRepository.create(user)
 

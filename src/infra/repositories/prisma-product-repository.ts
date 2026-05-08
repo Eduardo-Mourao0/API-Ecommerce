@@ -29,6 +29,23 @@ export class PrismaProductRepository implements ProductRepository {
         
     }
 
+    async findExactMatch(product: Product): Promise<Product | null> {
+        const data = await this.tx.product.findFirst({
+            where: {
+                name: { equals: product.name, mode: 'insensitive' },
+                description: product.description,
+                price: product.price,
+            },
+        })
+
+        if (!data) return null
+
+        return Product.createFromPrimitives({
+            ...data,
+            price: Number(data.price),
+        })
+    }
+
     async findByName(name: string): Promise<Product[]> {
         const products = await this.tx.product.findMany({
         where: { name: { contains: name, mode: 'insensitive' } },
