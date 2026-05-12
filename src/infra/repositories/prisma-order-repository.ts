@@ -2,7 +2,7 @@ import { Prisma } from '@prisma/client'
 import { Order } from '../../domain/entities/order'
 import { OrderItem } from '../../domain/entities/order-item'
 import { IOrderRepository } from '../../domain/repositories/order-repository'
-import { PrismaTransactionClient } from '../../domain/managers/ITransactionManager'
+import { PrismaTransactionClient } from '../database/prisma/prisma-transaction-client'
 
 type OrderWithItems = Prisma.OrderGetPayload<{
     include: { items: true }

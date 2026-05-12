@@ -2,7 +2,7 @@ import { OrderDTO, toOrderDTO } from '../../dtos/order-dto'
 import { Order } from '../../../domain/entities/order'
 import { OrderItem } from '../../../domain/entities/order-item'
 import { BusinessError } from '../../../domain/errors/business-error'
-import { ITransactionManager, PrismaTransactionClient } from '../../../domain/managers/ITransactionManager'
+import { ITransactionManager, TransactionContext } from '../../../domain/managers/ITransactionManager'
 import { CartRepository } from '../../../domain/repositories/cart-repository'
 import { IOrderRepository } from '../../../domain/repositories/order-repository'
 import { ProductRepository } from '../../../domain/repositories/product-repository'
@@ -11,9 +11,9 @@ interface CreateOrderRequest {
     userId: string
 }
 
-type OrderRepositoryFactory = (tx: PrismaTransactionClient) => IOrderRepository
-type CartRepositoryFactory = (tx: PrismaTransactionClient) => CartRepository
-type ProductRepositoryFactory = (tx: PrismaTransactionClient) => ProductRepository
+type OrderRepositoryFactory = (tx: TransactionContext) => IOrderRepository
+type CartRepositoryFactory = (tx: TransactionContext) => CartRepository
+type ProductRepositoryFactory = (tx: TransactionContext) => ProductRepository
 
 export class CreateOrderUseCase {
     constructor(

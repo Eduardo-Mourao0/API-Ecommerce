@@ -1,6 +1,7 @@
 import type { PrismaClient } from "@prisma/client";
-import { ITransactionManager, PrismaTransactionClient, TransactionCallback, TransactionManagerConfig } from "../../../domain/managers/ITransactionManager";
+import { ITransactionManager, TransactionCallback, TransactionManagerConfig } from "../../../domain/managers/ITransactionManager";
 import { prisma } from "./prisma-client";
+import { PrismaTransactionClient } from "./prisma-transaction-client";
 
 const DEFAULT_CONFIG: Required<TransactionManagerConfig> = {
     timeout: 30000,

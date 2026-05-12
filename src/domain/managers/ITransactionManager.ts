@@ -1,15 +1,16 @@
-import type { Prisma, PrismaClient } from "@prisma/client";
+export interface TransactionContext {}
 
-export type PrismaTransactionClient = Omit<
-    PrismaClient,
-    "$connect" | "$disconnect" | "$on" | "$transaction" | "$extends"
->;
+export type TransactionCallback<T> = (tx: TransactionContext) => Promise<T>;
 
-export type TransactionCallback<T> = (tx: PrismaTransactionClient) => Promise<T>;
+export type TransactionIsolationLevel =
+    | 'ReadUncommitted'
+    | 'ReadCommitted'
+    | 'RepeatableRead'
+    | 'Serializable'
 
 interface Config {
     timeout?: number;
-    isolationLevel?: Prisma.TransactionIsolationLevel;
+    isolationLevel?: TransactionIsolationLevel;
 }
 
 export interface ITransactionManager {

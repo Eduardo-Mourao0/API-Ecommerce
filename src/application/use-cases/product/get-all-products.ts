@@ -1,21 +1,12 @@
 import { ProductDTO, toProductDTO } from '../../dtos/product-dto'
-import { ITransactionManager, PrismaTransactionClient } from '../../../domain/managers/ITransactionManager'
 import { ProductRepository } from '../../../domain/repositories/product-repository'
 
-type ProductRepositoryFactory = (tx: PrismaTransactionClient) => ProductRepository
-
 export class GetAllProductsUseCase {
-    constructor(
-        private transactionManager: ITransactionManager,
-        private productRepositoryFactory: ProductRepositoryFactory
-    ) {}
+    constructor(private productRepository: ProductRepository) {}
 
     async execute(): Promise<ProductDTO[]> {
-        return await this.transactionManager.execute(async (tx) => {
-            const productRepository = this.productRepositoryFactory(tx)
-            const products = await productRepository.findAll()
+        const products = await this.productRepository.findAll()
 
-            return products.map(toProductDTO)
-        })
+        return products.map(toProductDTO)
     }
 }

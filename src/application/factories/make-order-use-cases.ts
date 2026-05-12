@@ -1,4 +1,6 @@
-import { ITransactionManager, PrismaTransactionClient } from '../../domain/managers/ITransactionManager'
+import { ITransactionManager, TransactionContext } from '../../domain/managers/ITransactionManager'
+import { prisma } from '../../infra/database/prisma/prisma-client'
+import { PrismaTransactionClient } from '../../infra/database/prisma/prisma-transaction-client'
 import { PrismaTransactionManager } from '../../infra/database/prisma/prisma-transaction-manager'
 import { PrismaCartRepository } from '../../infra/repositories/prisma-cart-repository'
 import { PrismaOrderRepository } from '../../infra/repositories/prisma-order-repository'
@@ -11,9 +13,16 @@ import { PayOrderUseCase } from '../use-cases/order/pay-order'
 export function makeOrderUseCases(
     transactionManager: ITransactionManager = new PrismaTransactionManager()
 ) {
-    const orderRepositoryFactory = (tx: PrismaTransactionClient) => new PrismaOrderRepository(tx)
-    const cartRepositoryFactory = (tx: PrismaTransactionClient) => new PrismaCartRepository(tx)
-    const productRepositoryFactory = (tx: PrismaTransactionClient) => new PrismaProductRepository(tx)
+    const orderRepository = new PrismaOrderRepository(prisma)
+    const orderRepositoryFactory = (tx: TransactionContext) => {
+        return new PrismaOrderRepository(tx as PrismaTransactionClient)
+    }
+    const cartRepositoryFactory = (tx: TransactionContext) => {
+        return new PrismaCartRepository(tx as PrismaTransactionClient)
+    }
+    const productRepositoryFactory = (tx: TransactionContext) => {
+        return new PrismaProductRepository(tx as PrismaTransactionClient)
+    }
 
     return {
         createOrder: new CreateOrderUseCase(
@@ -22,9 +31,9 @@ export function makeOrderUseCases(
             cartRepositoryFactory,
             productRepositoryFactory
         ),
-        getUserOrders: new GetUserOrdersUseCase(transactionManager, orderRepositoryFactory),
-        cancelOrder: new CancelOrderUseCase(transactionManager, orderRepositoryFactory),
-        payOrder: new PayOrderUseCase(transactionManager, orderRepositoryFactory),
+        getUserOrders: new GetUserOrdersUseCase(orderRepository),
+        cancelOrder: new CancelOrderUseCase(orderRepository),
+        payOrder: new PayOrderUseCase(orderRepository),
     }
 }
 

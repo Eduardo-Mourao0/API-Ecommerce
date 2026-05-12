@@ -1,6 +1,6 @@
 import { ProductDTO, toProductDTO } from '../../dtos/product-dto'
 import { Product } from '../../../domain/entities/product'
-import { ITransactionManager, PrismaTransactionClient } from '../../../domain/managers/ITransactionManager'
+import { ITransactionManager, TransactionContext } from '../../../domain/managers/ITransactionManager'
 import { ProductRepository } from '../../../domain/repositories/product-repository'
 
 interface CreateProductRequest {
@@ -10,7 +10,7 @@ interface CreateProductRequest {
     stock: number
 }
 
-type ProductRepositoryFactory = (tx: PrismaTransactionClient) => ProductRepository
+type ProductRepositoryFactory = (tx: TransactionContext) => ProductRepository
 
 export class CreateProductUseCase {
     constructor(
@@ -21,7 +21,9 @@ export class CreateProductUseCase {
     async execute(request: CreateProductRequest): Promise<ProductDTO> {
         return await this.transactionManager.execute(async (tx) => {
             const productRepository = this.productRepositoryFactory(tx)
+            
             const product = Product.create(request)
+            
             const existingProduct = await productRepository.findExactMatch(product)
 
             if (existingProduct) {

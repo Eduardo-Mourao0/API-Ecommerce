@@ -1,6 +1,6 @@
 import { CartDTO, toCartDTO } from '../../dtos/cart-dto'
 import { BusinessError } from '../../../domain/errors/business-error'
-import { ITransactionManager, PrismaTransactionClient } from '../../../domain/managers/ITransactionManager'
+import { ITransactionManager, TransactionContext } from '../../../domain/managers/ITransactionManager'
 import { CartRepository } from '../../../domain/repositories/cart-repository'
 
 interface RemoveItemFromCartRequest {
@@ -8,7 +8,7 @@ interface RemoveItemFromCartRequest {
     cartItemId: string
 }
 
-type CartRepositoryFactory = (tx: PrismaTransactionClient) => CartRepository
+type CartRepositoryFactory = (tx: TransactionContext) => CartRepository
 
 export class RemoveItemFromCartUseCase {
     constructor(

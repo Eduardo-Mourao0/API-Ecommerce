@@ -1,6 +1,6 @@
 import { Product } from '../../domain/entities/product'
 import { ProductRepository } from '../../domain/repositories/product-repository'
-import { PrismaTransactionClient } from '../../domain/managers/ITransactionManager'
+import { PrismaTransactionClient } from '../database/prisma/prisma-transaction-client'
 
 export class PrismaProductRepository implements ProductRepository {
     constructor(private readonly tx: PrismaTransactionClient) {}

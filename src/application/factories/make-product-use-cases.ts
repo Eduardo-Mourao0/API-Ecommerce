@@ -1,4 +1,6 @@
-import { ITransactionManager, PrismaTransactionClient } from '../../domain/managers/ITransactionManager'
+import { ITransactionManager, TransactionContext } from '../../domain/managers/ITransactionManager'
+import { prisma } from '../../infra/database/prisma/prisma-client'
+import { PrismaTransactionClient } from '../../infra/database/prisma/prisma-transaction-client'
 import { PrismaTransactionManager } from '../../infra/database/prisma/prisma-transaction-manager'
 import { PrismaProductRepository } from '../../infra/repositories/prisma-product-repository'
 import { CreateProductUseCase } from '../use-cases/product/create-product'
@@ -10,14 +12,17 @@ import { UpdateProductUseCase } from '../use-cases/product/update-product'
 export function makeProductUseCases(
     transactionManager: ITransactionManager = new PrismaTransactionManager()
 ) {
-    const productRepositoryFactory = (tx: PrismaTransactionClient) => new PrismaProductRepository(tx)
+    const productRepository = new PrismaProductRepository(prisma)
+    const productRepositoryFactory = (tx: TransactionContext) => {
+        return new PrismaProductRepository(tx as PrismaTransactionClient)
+    }
 
     return {
         createProduct: new CreateProductUseCase(transactionManager, productRepositoryFactory),
-        getAllProducts: new GetAllProductsUseCase(transactionManager, productRepositoryFactory),
-        getProductByName: new GetProductByNameUseCase(transactionManager, productRepositoryFactory),
-        updateProduct: new UpdateProductUseCase(transactionManager, productRepositoryFactory),
-        deleteProduct: new DeleteProductUseCase(transactionManager, productRepositoryFactory),
+        getAllProducts: new GetAllProductsUseCase(productRepository),
+        getProductByName: new GetProductByNameUseCase(productRepository),
+        updateProduct: new UpdateProductUseCase(productRepository),
+        deleteProduct: new DeleteProductUseCase(productRepository),
     }
 }
 

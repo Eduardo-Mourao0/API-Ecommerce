@@ -1,4 +1,6 @@
-import { ITransactionManager, PrismaTransactionClient } from '../../domain/managers/ITransactionManager'
+import { ITransactionManager, TransactionContext } from '../../domain/managers/ITransactionManager'
+import { prisma } from '../../infra/database/prisma/prisma-client'
+import { PrismaTransactionClient } from '../../infra/database/prisma/prisma-transaction-client'
 import { PrismaTransactionManager } from '../../infra/database/prisma/prisma-transaction-manager'
 import { PrismaCartRepository } from '../../infra/repositories/prisma-cart-repository'
 import { PrismaProductRepository } from '../../infra/repositories/prisma-product-repository'
@@ -10,14 +12,19 @@ import { RemoveItemFromCartUseCase } from '../use-cases/cart/remove-item-from-ca
 export function makeCartUseCases(
     transactionManager: ITransactionManager = new PrismaTransactionManager()
 ) {
-    const cartRepositoryFactory = (tx: PrismaTransactionClient) => new PrismaCartRepository(tx)
-    const productRepositoryFactory = (tx: PrismaTransactionClient) => new PrismaProductRepository(tx)
+    const cartRepository = new PrismaCartRepository(prisma)
+    const cartRepositoryFactory = (tx: TransactionContext) => {
+        return new PrismaCartRepository(tx as PrismaTransactionClient)
+    }
+    const productRepositoryFactory = (tx: TransactionContext) => {
+        return new PrismaProductRepository(tx as PrismaTransactionClient)
+    }
 
     return {
         addItemToCart: new AddItemToCartUseCase(transactionManager, cartRepositoryFactory, productRepositoryFactory),
         removeItemFromCart: new RemoveItemFromCartUseCase(transactionManager, cartRepositoryFactory),
-        getCart: new GetCartUseCase(transactionManager, cartRepositoryFactory),
-        clearCart: new ClearCartUseCase(transactionManager, cartRepositoryFactory),
+        getCart: new GetCartUseCase(cartRepository),
+        clearCart: new ClearCartUseCase(cartRepository),
     }
 }
 

@@ -2,7 +2,7 @@ import { Prisma } from '@prisma/client'
 import { Cart } from '../../domain/entities/cart'
 import { CartItem } from '../../domain/entities/cart-item'
 import { CartRepository } from '../../domain/repositories/cart-repository'
-import { PrismaTransactionClient } from '../../domain/managers/ITransactionManager'
+import { PrismaTransactionClient } from '../database/prisma/prisma-transaction-client'
 
 type CartWithItems = Prisma.CartGetPayload<{
     include: { items: { include: { product: true } } }
