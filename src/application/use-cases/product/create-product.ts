@@ -1,6 +1,5 @@
 import { ProductDTO, toProductDTO } from '../../dtos/product-dto'
 import { Product } from '../../../domain/entities/product'
-import { ITransactionManager, TransactionContext } from '../../../domain/managers/ITransactionManager'
 import { ProductRepository } from '../../../domain/repositories/product-repository'
 
 interface CreateProductRequest {
@@ -10,33 +9,23 @@ interface CreateProductRequest {
     stock: number
 }
 
-type ProductRepositoryFactory = (tx: TransactionContext) => ProductRepository
-
 export class CreateProductUseCase {
-    constructor(
-        private transactionManager: ITransactionManager,
-        private productRepositoryFactory: ProductRepositoryFactory
-    ) {}
+    constructor(private productRepository: ProductRepository) {}
 
     async execute(request: CreateProductRequest): Promise<ProductDTO> {
-        return await this.transactionManager.execute(async (tx) => {
-            const productRepository = this.productRepositoryFactory(tx)
-            
-            const product = Product.create(request)
-            
-            const existingProduct = await productRepository.findExactMatch(product)
+        const product = Product.create(request)
+        const existingProduct = await this.productRepository.findExactMatch(product)
 
-            if (existingProduct) {
-                existingProduct.stock += product.stock
+        if (existingProduct) {
+            existingProduct.stock += product.stock
 
-                const updatedProduct = await productRepository.update(existingProduct)
+            const updatedProduct = await this.productRepository.update(existingProduct)
 
-                return toProductDTO(updatedProduct)
-            }
+            return toProductDTO(updatedProduct)
+        }
 
-            const createdProduct = await productRepository.create(product)
+        const createdProduct = await this.productRepository.create(product)
 
-            return toProductDTO(createdProduct)
-        })
+        return toProductDTO(createdProduct)
     }
 }

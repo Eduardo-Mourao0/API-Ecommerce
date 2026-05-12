@@ -1,12 +1,12 @@
 import { Product } from '../../domain/entities/product'
 import { ProductRepository } from '../../domain/repositories/product-repository'
-import { PrismaTransactionClient } from '../database/prisma/prisma-transaction-client'
+import { PrismaRepositoryClient } from '../database/prisma/prisma-repository-client'
 
 export class PrismaProductRepository implements ProductRepository {
-    constructor(private readonly tx: PrismaTransactionClient) {}
+    constructor(private readonly prisma: PrismaRepositoryClient) {}
 
     async create(product: Product): Promise<Product> {
-        await this.tx.product.create({
+        await this.prisma.product.create({
         data: {
             id: product.id,
             name: product.name,
@@ -21,7 +21,7 @@ export class PrismaProductRepository implements ProductRepository {
     }
 
     async findById(id: string): Promise<Product | null> {
-        const data = await this.tx.product.findUnique({ where: { id } })
+        const data = await this.prisma.product.findUnique({ where: { id } })
         if (!data) return null
         return Product.createFromPrimitives({...data,
             price: Number(data.price)
@@ -30,7 +30,7 @@ export class PrismaProductRepository implements ProductRepository {
     }
 
     async findExactMatch(product: Product): Promise<Product | null> {
-        const data = await this.tx.product.findFirst({
+        const data = await this.prisma.product.findFirst({
             where: {
                 name: { equals: product.name, mode: 'insensitive' },
                 description: product.description,
@@ -47,7 +47,7 @@ export class PrismaProductRepository implements ProductRepository {
     }
 
     async findByName(name: string): Promise<Product[]> {
-        const products = await this.tx.product.findMany({
+        const products = await this.prisma.product.findMany({
         where: { name: { contains: name, mode: 'insensitive' } },
         })
         return products.map(p => Product.createFromPrimitives({
@@ -57,7 +57,7 @@ export class PrismaProductRepository implements ProductRepository {
     }
 
     async findAll(): Promise<Product[]> {
-        const products = await this.tx.product.findMany()
+        const products = await this.prisma.product.findMany()
         return products.map(p => Product.createFromPrimitives({
         ...p,
         price: Number(p.price)
@@ -65,7 +65,7 @@ export class PrismaProductRepository implements ProductRepository {
     }
 
     async update(product: Product): Promise<Product> {
-        await this.tx.product.update({
+        await this.prisma.product.update({
         where: { id: product.id },
         data: {
             name: product.name,
@@ -79,6 +79,6 @@ export class PrismaProductRepository implements ProductRepository {
     }
 
     async delete(id: string): Promise<void> {
-        await this.tx.product.delete({ where: { id } })
+        await this.prisma.product.delete({ where: { id } })
     }
 }

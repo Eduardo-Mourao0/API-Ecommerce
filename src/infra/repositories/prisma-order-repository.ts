@@ -2,17 +2,17 @@ import { Prisma } from '@prisma/client'
 import { Order } from '../../domain/entities/order'
 import { OrderItem } from '../../domain/entities/order-item'
 import { IOrderRepository } from '../../domain/repositories/order-repository'
-import { PrismaTransactionClient } from '../database/prisma/prisma-transaction-client'
+import { PrismaRepositoryClient } from '../database/prisma/prisma-repository-client'
 
 type OrderWithItems = Prisma.OrderGetPayload<{
     include: { items: true }
 }>
 
 export class PrismaOrderRepository implements IOrderRepository {
-    constructor(private readonly tx: PrismaTransactionClient) {}
+    constructor(private readonly prisma: PrismaRepositoryClient) {}
 
     async create(order: Order): Promise<Order> {
-        await this.tx.order.create({
+        await this.prisma.order.create({
         data: {
             id: order.id,
             userId: order.userId,
@@ -34,7 +34,7 @@ export class PrismaOrderRepository implements IOrderRepository {
     }
 
     async findById(id: string): Promise<Order | null> {
-        const data = await this.tx.order.findUnique({
+        const data = await this.prisma.order.findUnique({
             where: { id },
             include: { items: true },
         })
@@ -45,7 +45,7 @@ export class PrismaOrderRepository implements IOrderRepository {
     }
 
     async findByUserId(userId: string): Promise<Order[]> {
-        const orders = await this.tx.order.findMany({
+        const orders = await this.prisma.order.findMany({
             where: { userId },
             include: { items: true },
         })
@@ -54,7 +54,7 @@ export class PrismaOrderRepository implements IOrderRepository {
     }
 
     async update(order: Order): Promise<Order> {
-        await this.tx.order.update({
+        await this.prisma.order.update({
             where: { id: order.id },
             data: { status: order.status },
         })

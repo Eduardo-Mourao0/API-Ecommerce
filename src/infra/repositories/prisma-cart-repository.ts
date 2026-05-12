@@ -2,17 +2,17 @@ import { Prisma } from '@prisma/client'
 import { Cart } from '../../domain/entities/cart'
 import { CartItem } from '../../domain/entities/cart-item'
 import { CartRepository } from '../../domain/repositories/cart-repository'
-import { PrismaTransactionClient } from '../database/prisma/prisma-transaction-client'
+import { PrismaRepositoryClient } from '../database/prisma/prisma-repository-client'
 
 type CartWithItems = Prisma.CartGetPayload<{
     include: { items: { include: { product: true } } }
 }>
 
 export class PrismaCartRepository implements CartRepository {
-    constructor(private readonly tx: PrismaTransactionClient) {}
+    constructor(private readonly prisma: PrismaRepositoryClient) {}
 
     async create(cart: Cart): Promise<Cart> {
-        await this.tx.cart.create({
+        await this.prisma.cart.create({
             data: this.toCreateData(cart),
         })
 
@@ -20,7 +20,7 @@ export class PrismaCartRepository implements CartRepository {
     }
 
     async findByUserId(userId: string): Promise<Cart | null> {
-        const data = await this.tx.cart.findUnique({
+        const data = await this.prisma.cart.findUnique({
             where: { userId },
             include: { items: { include: { product: true } } },
         })
@@ -31,7 +31,7 @@ export class PrismaCartRepository implements CartRepository {
     }
 
     async update(cart: Cart): Promise<Cart> {
-        await this.tx.cart.update({
+        await this.prisma.cart.update({
             where: { id: cart.id },
             data: { updatedAt: cart.updatedAt },
         })
@@ -43,7 +43,7 @@ export class PrismaCartRepository implements CartRepository {
     }
 
     async clear(cartId: string): Promise<void> {
-        await this.tx.cartItem.deleteMany({ where: { cartId } })
+        await this.prisma.cartItem.deleteMany({ where: { cartId } })
     }
 
     private toCreateData(cart: Cart): Prisma.CartUncheckedCreateInput {
@@ -74,7 +74,7 @@ export class PrismaCartRepository implements CartRepository {
     private async deleteRemovedItems(cart: Cart): Promise<void> {
         const itemIds = cart.items.map(item => item.id)
 
-        await this.tx.cartItem.deleteMany({
+        await this.prisma.cartItem.deleteMany({
             where: {
                 cartId: cart.id,
                 id: { notIn: itemIds },
@@ -84,7 +84,7 @@ export class PrismaCartRepository implements CartRepository {
 
     private async upsertItems(items: CartItem[]): Promise<void> {
         for (const item of items) {
-            await this.tx.cartItem.upsert({
+            await this.prisma.cartItem.upsert({
                 where: { id: item.id },
                 update: { quantity: item.quantity },
                 create: {

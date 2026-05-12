@@ -1,6 +1,6 @@
 import { ITransactionManager, TransactionContext } from '../../domain/managers/ITransactionManager'
 import { prisma } from '../../infra/database/prisma/prisma-client'
-import { PrismaTransactionClient } from '../../infra/database/prisma/prisma-transaction-client'
+import { PrismaRepositoryClient } from '../../infra/database/prisma/prisma-repository-client'
 import { PrismaTransactionManager } from '../../infra/database/prisma/prisma-transaction-manager'
 import { PrismaCartRepository } from '../../infra/repositories/prisma-cart-repository'
 import { PrismaOrderRepository } from '../../infra/repositories/prisma-order-repository'
@@ -15,13 +15,13 @@ export function makeOrderUseCases(
 ) {
     const orderRepository = new PrismaOrderRepository(prisma)
     const orderRepositoryFactory = (tx: TransactionContext) => {
-        return new PrismaOrderRepository(tx as PrismaTransactionClient)
+        return new PrismaOrderRepository(tx as PrismaRepositoryClient)
     }
     const cartRepositoryFactory = (tx: TransactionContext) => {
-        return new PrismaCartRepository(tx as PrismaTransactionClient)
+        return new PrismaCartRepository(tx as PrismaRepositoryClient)
     }
     const productRepositoryFactory = (tx: TransactionContext) => {
-        return new PrismaProductRepository(tx as PrismaTransactionClient)
+        return new PrismaProductRepository(tx as PrismaRepositoryClient)
     }
 
     return {

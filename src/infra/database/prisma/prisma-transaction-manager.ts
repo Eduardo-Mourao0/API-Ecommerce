@@ -1,7 +1,7 @@
 import type { PrismaClient } from "@prisma/client";
 import { ITransactionManager, TransactionCallback, TransactionManagerConfig } from "../../../domain/managers/ITransactionManager";
 import { prisma } from "./prisma-client";
-import { PrismaTransactionClient } from "./prisma-transaction-client";
+import { PrismaRepositoryClient } from "./prisma-repository-client";
 
 const DEFAULT_CONFIG: Required<TransactionManagerConfig> = {
     timeout: 30000,
@@ -19,7 +19,7 @@ export class PrismaTransactionManager implements ITransactionManager {
         timeout?: number
     ): Promise<T> {
         return await this.transactionClient.$transaction(
-            (tx: any) => action(tx as PrismaTransactionClient),
+            (tx: any) => action(tx as PrismaRepositoryClient),
             {
                 ...this.config,
                 timeout: timeout ?? this.config.timeout
