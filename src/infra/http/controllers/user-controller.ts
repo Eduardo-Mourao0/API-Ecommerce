@@ -1,6 +1,16 @@
 import { type NextFunction, type Request, type Response } from 'express'
-import { type UserUseCases } from '../../../application/factories/make-user-use-cases'
+import { type CreateUserUseCase } from '../../../application/use-cases/user/create-user-usecase'
+import { type DeleteUserUseCase } from '../../../application/use-cases/user/delete-user'
+import { type GetAllUsersUseCase } from '../../../application/use-cases/user/get-all-users-usecase'
+import { type LoginUserUseCase } from '../../../application/use-cases/user/login-usecase'
 import { getAuthenticatedUserId } from './http-auth'
+
+export interface UserUseCases {
+    createUser: CreateUserUseCase
+    loginUser: LoginUserUseCase
+    getAllUsers: GetAllUsersUseCase
+    deleteUser: DeleteUserUseCase
+}
 
 export class UserController {
     constructor(private readonly userUseCases: UserUseCases) {}

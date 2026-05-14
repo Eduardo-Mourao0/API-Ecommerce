@@ -1,7 +1,17 @@
 import { type NextFunction, type Request, type Response } from 'express'
-import { type CartUseCases } from '../../../application/factories/make-cart-use-cases'
+import { type AddItemToCartUseCase } from '../../../application/use-cases/cart/add-item-to-cart'
+import { type ClearCartUseCase } from '../../../application/use-cases/cart/clear-cart'
+import { type GetCartUseCase } from '../../../application/use-cases/cart/get-cart'
+import { type RemoveItemFromCartUseCase } from '../../../application/use-cases/cart/remove-item-from-cart'
 import { getAuthenticatedUserId } from './http-auth'
 import { getRouteParam } from './http-params'
+
+export interface CartUseCases {
+    addItemToCart: AddItemToCartUseCase
+    removeItemFromCart: RemoveItemFromCartUseCase
+    getCart: GetCartUseCase
+    clearCart: ClearCartUseCase
+}
 
 export class CartController {
     constructor(private readonly cartUseCases: CartUseCases) {}

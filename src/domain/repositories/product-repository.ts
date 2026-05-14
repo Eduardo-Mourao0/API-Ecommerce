@@ -15,4 +15,6 @@ export interface ProductRepository {
     update(product: Product): Promise<Product>
     
     delete(id: string): Promise<void>
+
+    decreaseStock(productId: string, quantity: number): Promise<boolean>
 }

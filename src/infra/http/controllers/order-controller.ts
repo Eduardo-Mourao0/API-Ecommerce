@@ -1,7 +1,17 @@
 import { type NextFunction, type Request, type Response } from 'express'
-import { type OrderUseCases } from '../../../application/factories/make-order-use-cases'
+import { type CancelOrderUseCase } from '../../../application/use-cases/order/cancel-order'
+import { type CreateOrderUseCase } from '../../../application/use-cases/order/create-order'
+import { type GetUserOrdersUseCase } from '../../../application/use-cases/order/get-all-order'
+import { type PayOrderUseCase } from '../../../application/use-cases/order/pay-order'
 import { getAuthenticatedUserId } from './http-auth'
 import { getRouteParam } from './http-params'
+
+export interface OrderUseCases {
+    createOrder: CreateOrderUseCase
+    getUserOrders: GetUserOrdersUseCase
+    cancelOrder: CancelOrderUseCase
+    payOrder: PayOrderUseCase
+}
 
 export class OrderController {
     constructor(private readonly orderUseCases: OrderUseCases) {}

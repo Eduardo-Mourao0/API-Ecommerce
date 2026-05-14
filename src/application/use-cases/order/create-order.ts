@@ -28,6 +28,7 @@ export class CreateOrderUseCase {
             const orderRepository = this.orderRepositoryFactory(tx)
             const cartRepository = this.cartRepositoryFactory(tx)
             const productRepository = this.productRepositoryFactory(tx)
+
             const cart = await cartRepository.findByUserId(request.userId)
 
             if (!cart || cart.items.length === 0) {
@@ -44,16 +45,13 @@ export class CreateOrderUseCase {
                     throw new BusinessError('Produto nao encontrado.')
                 }
 
-                if (product.stock < cartItem.quantity) {
-                    throw new BusinessError(`Stock insuficiente para o produto ${product.name}.`)
+                const hasStock = await productRepository.decreaseStock(product.id, cartItem.quantity)
+
+                if (!hasStock) {
+                    throw new BusinessError(`Produto ${product.name} nao possui estoque suficiente.`)
                 }
 
-                product.stock -= cartItem.quantity
-
-                await productRepository.update(product)
-
                 const orderItem = OrderItem.create({
-                    orderId: '',
                     productId: product.id,
                     quantity: cartItem.quantity,
                     price: product.price,

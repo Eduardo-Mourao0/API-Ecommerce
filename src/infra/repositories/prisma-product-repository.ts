@@ -22,7 +22,9 @@ export class PrismaProductRepository implements ProductRepository {
 
     async findById(id: string): Promise<Product | null> {
         const data = await this.prisma.product.findUnique({ where: { id } })
+
         if (!data) return null
+
         return Product.createFromPrimitives({...data,
             price: Number(data.price)
         })
@@ -50,6 +52,7 @@ export class PrismaProductRepository implements ProductRepository {
         const products = await this.prisma.product.findMany({
         where: { name: { contains: name, mode: 'insensitive' } },
         })
+
         return products.map(p => Product.createFromPrimitives({
         ...p,
         price: Number(p.price)
@@ -58,6 +61,7 @@ export class PrismaProductRepository implements ProductRepository {
 
     async findAll(): Promise<Product[]> {
         const products = await this.prisma.product.findMany()
+
         return products.map(p => Product.createFromPrimitives({
         ...p,
         price: Number(p.price)
@@ -80,5 +84,23 @@ export class PrismaProductRepository implements ProductRepository {
 
     async delete(id: string): Promise<void> {
         await this.prisma.product.delete({ where: { id } })
+    }
+
+    async decreaseStock(productId: string, quantity: number): Promise<boolean> {
+        const result = await this.prisma.product.updateMany({
+            where: {
+                id: productId,
+                stock: {
+                    gte: quantity,
+                },
+            },
+            data: {
+                stock: {
+                    decrement: quantity,
+                },
+            },
+        })
+
+        return result.count > 0
     }
 }

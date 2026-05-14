@@ -1,11 +1,23 @@
 import { type NextFunction, type Request, type Response } from 'express'
-import { type ProductUseCases } from '../../../application/factories/make-product-use-cases'
+import { type CreateProductUseCase } from '../../../application/use-cases/product/create-product'
+import { type DeleteProductUseCase } from '../../../application/use-cases/product/delete-product'
+import { type GetAllProductsUseCase } from '../../../application/use-cases/product/get-all-products'
+import { type GetProductByNameUseCase } from '../../../application/use-cases/product/get-product-by-name'
+import { type UpdateProductUseCase } from '../../../application/use-cases/product/update-product'
 import { getRouteParam } from './http-params'
 
 function getProductName(req: Request): string {
     const name = req.params.name ?? req.query.name ?? ''
 
     return String(name)
+}
+
+export interface ProductUseCases {
+    createProduct: CreateProductUseCase
+    getAllProducts: GetAllProductsUseCase
+    getProductByName: GetProductByNameUseCase
+    updateProduct: UpdateProductUseCase
+    deleteProduct: DeleteProductUseCase
 }
 
 export class ProductController {
