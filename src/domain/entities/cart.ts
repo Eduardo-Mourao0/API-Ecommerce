@@ -1,5 +1,6 @@
 import { v4 as uuidv4 } from 'uuid'
 import { CartItem } from './cart-item'
+import { BusinessError } from '../errors/business-error'
 
 export class Cart {
     public readonly id: string
@@ -32,11 +33,18 @@ export class Cart {
         return new Cart(data)
     }
 
-    addItem(item: CartItem): void {
+    addItem(item: CartItem, stock: number): void {
+        
         const existing = this.items.find(i => i.productId === item.productId)
+        
+        const currentQuantity = existing ? existing.quantity : 0
+        const nextQuantity = currentQuantity + item.quantity
 
+        if (nextQuantity > stock) {
+            throw new BusinessError('Quantidade solicitada excede o estoque disponível.')
+        }
         if (existing) {
-            existing.quantity += item.quantity
+            existing.quantity = nextQuantity
         } else {
             this.items.unshift(item)
         }

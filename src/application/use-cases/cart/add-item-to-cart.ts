@@ -48,9 +48,8 @@ export class AddItemToCartUseCase {
             if (!product) {
                 throw new BusinessError('Produto não encontrado.')
             }
-
             if (product.stock < request.quantity) {
-                throw new BusinessError('Stock insuficiente.')
+                throw new BusinessError('Quantidade solicitada excede o estoque disponível.')
             }
 
             const existingCart = await cartRepository.findByUserId(request.userId)
@@ -67,7 +66,7 @@ export class AddItemToCartUseCase {
                 quantity: request.quantity,
             })
 
-            cart.addItem(item)
+            cart.addItem(item, product.stock)
 
             const updatedCart = await cartRepository.update(cart)
 
