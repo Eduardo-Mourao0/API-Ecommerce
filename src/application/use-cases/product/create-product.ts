@@ -17,7 +17,9 @@ export class CreateProductUseCase {
         const existingProduct = await this.productRepository.findExactMatch(product)
 
         if (existingProduct) {
-            existingProduct.stock += product.stock
+            existingProduct.update({
+                stock: existingProduct.stock + product.stock,
+            })
 
             const updatedProduct = await this.productRepository.update(existingProduct)
 

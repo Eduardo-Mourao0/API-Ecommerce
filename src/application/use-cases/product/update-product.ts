@@ -17,13 +17,15 @@ export class UpdateProductUseCase {
         const product = await this.productRepository.findById(request.id)
 
         if (!product) {
-            throw new BusinessError('Produto n\u00e3o encontrado.')
+            throw new BusinessError('Produto nao encontrado.')
         }
 
-        if (request.name) product.name = request.name
-        if (request.description) product.description = request.description
-        if (request.price) product.price = request.price
-        if (request.stock !== undefined) product.stock = request.stock
+        product.update({
+            name: request.name,
+            description: request.description,
+            price: request.price,
+            stock: request.stock,
+        })
 
         const updatedProduct = await this.productRepository.update(product)
 
