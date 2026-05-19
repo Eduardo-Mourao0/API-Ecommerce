@@ -5,6 +5,7 @@ import { type GetCartUseCase } from '../../../application/use-cases/cart/get-car
 import { type RemoveItemFromCartUseCase } from '../../../application/use-cases/cart/remove-item-from-cart'
 import { getAuthenticatedUserId } from './http-auth'
 import { getRouteParam } from './http-params'
+import { addItemToCartSchema } from '../validators/cart-validator'
 
 export interface CartUseCases {
     addItemToCart: AddItemToCartUseCase
@@ -19,11 +20,10 @@ export class CartController {
     async addItem(req: Request, res: Response, next: NextFunction): Promise<void> {
         try {
             const userId = getAuthenticatedUserId(req)
-            const { productId, quantity } = req.body
+            const body = addItemToCartSchema.parse(req.body)
             const cart = await this.cartUseCases.addItemToCart.execute({
                 userId,
-                productId,
-                quantity,
+                ...body,
             })
 
             res.status(200).json(cart)

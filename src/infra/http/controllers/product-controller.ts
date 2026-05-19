@@ -5,6 +5,7 @@ import { type GetAllProductsUseCase } from '../../../application/use-cases/produ
 import { type GetProductByNameUseCase } from '../../../application/use-cases/product/get-product-by-name'
 import { type UpdateProductUseCase } from '../../../application/use-cases/product/update-product'
 import { getRouteParam } from './http-params'
+import { createProductSchema, updateProductSchema } from '../validators/product-validator'
 
 function getProductName(req: Request): string {
     const name = req.params.name ?? req.query.name ?? ''
@@ -25,7 +26,8 @@ export class ProductController {
 
     async create(req: Request, res: Response, next: NextFunction): Promise<void> {
         try {
-            const product = await this.productUseCases.createProduct.execute(req.body)
+            const body = createProductSchema.parse(req.body)
+            const product = await this.productUseCases.createProduct.execute(body)
 
             res.status(201).json(product)
         } catch (error) {
@@ -57,8 +59,9 @@ export class ProductController {
 
     async update(req: Request, res: Response, next: NextFunction): Promise<void> {
         try {
+            const body = updateProductSchema.parse(req.body)
             const product = await this.productUseCases.updateProduct.execute({
-                ...req.body,
+                ...body,
                 id: getRouteParam(req, 'id'),
             })
 

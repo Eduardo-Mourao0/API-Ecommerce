@@ -4,6 +4,7 @@ import { type DeleteUserUseCase } from '../../../application/use-cases/user/dele
 import { type GetAllUsersUseCase } from '../../../application/use-cases/user/get-all-users-usecase'
 import { type LoginUserUseCase } from '../../../application/use-cases/user/login-usecase'
 import { getAuthenticatedUserId } from './http-auth'
+import { createUserSchema, loginUserSchema } from '../validators/user-validator'
 
 export interface UserUseCases {
     createUser: CreateUserUseCase
@@ -17,7 +18,8 @@ export class UserController {
 
     async create(req: Request, res: Response, next: NextFunction): Promise<void> {
         try {
-            const user = await this.userUseCases.createUser.execute(req.body)
+            const body = createUserSchema.parse(req.body)
+            const user = await this.userUseCases.createUser.execute(body)
 
             res.status(201).json(user)
         } catch (error) {
@@ -27,7 +29,8 @@ export class UserController {
 
     async login(req: Request, res: Response, next: NextFunction): Promise<void> {
         try {
-            const result = await this.userUseCases.loginUser.execute(req.body)
+            const body = loginUserSchema.parse(req.body)
+            const result = await this.userUseCases.loginUser.execute(body)
 
             res.status(200).json(result)
         } catch (error) {
