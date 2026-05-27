@@ -1,13 +1,15 @@
 import { type NextFunction, type Request, type Response } from 'express'
 import { type CreateUserUseCase } from '../../../application/use-cases/user/create-user-usecase'
+import { type CreateUserByAdminUseCase } from '../../../application/use-cases/user/create-user-by-admin-usecase'
 import { type DeleteUserUseCase } from '../../../application/use-cases/user/delete-user'
 import { type GetAllUsersUseCase } from '../../../application/use-cases/user/get-all-users-usecase'
 import { type LoginUserUseCase } from '../../../application/use-cases/user/login-usecase'
 import { getAuthenticatedUserId } from './http-auth'
-import { createUserSchema, loginUserSchema } from '../validators/user-validator'
+import { createUserByAdminSchema, createUserSchema, loginUserSchema } from '../validators/user-validator'
 
 export interface UserUseCases {
     createUser: CreateUserUseCase
+    createUserByAdmin: CreateUserByAdminUseCase
     loginUser: LoginUserUseCase
     getAllUsers: GetAllUsersUseCase
     deleteUser: DeleteUserUseCase
@@ -20,6 +22,17 @@ export class UserController {
         try {
             const body = createUserSchema.parse(req.body)
             const user = await this.userUseCases.createUser.execute(body)
+
+            res.status(201).json(user)
+        } catch (error) {
+            next(error)
+        }
+    }
+
+    async createByAdmin(req: Request, res: Response, next: NextFunction): Promise<void> {
+        try {
+            const body = createUserByAdminSchema.parse(req.body)
+            const user = await this.userUseCases.createUserByAdmin.execute(body)
 
             res.status(201).json(user)
         } catch (error) {

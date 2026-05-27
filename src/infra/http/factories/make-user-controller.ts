@@ -1,4 +1,5 @@
 import { CreateUserUseCase } from '../../../application/use-cases/user/create-user-usecase'
+import { CreateUserByAdminUseCase } from '../../../application/use-cases/user/create-user-by-admin-usecase'
 import { DeleteUserUseCase } from '../../../application/use-cases/user/delete-user'
 import { GetAllUsersUseCase } from '../../../application/use-cases/user/get-all-users-usecase'
 import { LoginUserUseCase } from '../../../application/use-cases/user/login-usecase'
@@ -15,6 +16,7 @@ export function makeUserController(): UserController {
 
     return new UserController({
         createUser: new CreateUserUseCase(userRepository, passwordHasher),
+        createUserByAdmin: new CreateUserByAdminUseCase(userRepository, passwordHasher),
         loginUser: new LoginUserUseCase(userRepository, passwordHasher, tokenGenerator),
         getAllUsers: new GetAllUsersUseCase(userRepository),
         deleteUser: new DeleteUserUseCase(userRepository),
